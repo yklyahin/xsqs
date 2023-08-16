@@ -29,15 +29,15 @@ type (
 )
 
 // FifoMiddleware creates and returns a new instance of the FifoDeduplicationMiddleware.
-func FifoMiddleware(next xsqs.Handler[*sqs.Message], storage Storage) FifoDeduplicationMiddleware {
-	return FifoDeduplicationMiddleware{
+func FifoMiddleware(next xsqs.Handler[*sqs.Message], storage Storage) *FifoDeduplicationMiddleware {
+	return &FifoDeduplicationMiddleware{
 		next:    next,
 		storage: storage,
 	}
 }
 
 // Handle handles the SQS message and provides deduplication logic.
-func (middleware FifoDeduplicationMiddleware) Handle(ctx context.Context, message *sqs.Message) error {
+func (middleware *FifoDeduplicationMiddleware) Handle(ctx context.Context, message *sqs.Message) error {
 	deduplicationID := aws.StringValue(message.Attributes["MessageDeduplicationId"])
 	if len(deduplicationID) == 0 {
 		return ErrMissingDeduplicationID
